@@ -1,0 +1,29 @@
+{
+  "name": "download-google-fonts",
+  "version": "1.0.1",
+  "description": "plugin for next.js",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krychaxp/download-google-fonts.git"
+  },
+  "author": "krychaxp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/krychaxp/download-google-fonts/issues"
+  },
+  "homepage": "https://github.com/krychaxp/download-google-fonts#readme",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "del": "^6.0.0",
+    "fs-extra": "^9.0.1",
+    "path": "^0.12.7"
+  }
+}
