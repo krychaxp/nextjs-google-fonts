@@ -1,6 +1,6 @@
 {
   "name": "nextjs-google-fonts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "plugin for next.js",
   "main": "index.js",
   "scripts": {
