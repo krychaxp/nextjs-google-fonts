@@ -56,9 +56,18 @@ const downloadFonts = async (fonts = [], options = {}) => {
   for (let i = 0; i < fonts.length; i++) {
     const v = fonts[i];
     try {
-      const { data } = await axios.get(v);
+      const { data } = await axios.get(v, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36",
+        },
+      });
+      console.log(data)
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
-      const newData=data.replace(/https:\/\/fonts\.gstatic\.com/g, `/${fontsFolder}`);
+      const newData = data.replace(
+        /https:\/\/fonts\.gstatic\.com/g,
+        `/${fontsFolder}`
+      );
       const name = v.match(/\?family=(\w+)/)[1];
       const css = path.join(fontsFolder, styleFolder, name + ".css");
       fs.outputFileSync(path.join(publicFolder, css), newData);
@@ -72,7 +81,7 @@ const downloadFonts = async (fonts = [], options = {}) => {
         fs.outputFileSync(path.join(publicFolder, font), resp.data);
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
       console.log(`${text} Cannot download following font:${v}`);
     }
   }
