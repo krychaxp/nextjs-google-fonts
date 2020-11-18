@@ -4,7 +4,6 @@ const axios = require("axios");
 const del = require("del");
 const text = "> [nextjs-google-fonts]";
 const http = require("http");
-let googleFonts={}
 const downloadFonts = async (fonts = [], options = {}) => {
   if (fonts.length == 0) {
     console.log("Nothing Google Fonts Downloaded");
@@ -71,14 +70,11 @@ const downloadFonts = async (fonts = [], options = {}) => {
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
         const name = va.replace("https://fonts.gstatic.com", "");
-        http.get(
-          va.replace('s',''),
-          function (response) {
-            const fp=path.join(process.cwd(),publicFolder,fontsFolder,name)
-            fs.outputFileSync(fp,'')
-            response.pipe(fs.createWriteStream(fp));
-          }
-        );
+        http.get(va.replace("s", ""), function (response) {
+          const fp = path.join(process.cwd(), publicFolder, fontsFolder, name);
+          fs.outputFileSync(fp, "");
+          response.pipe(fs.createWriteStream(fp));
+        });
         const font = path.join(fontsFolder, name);
         output.googleFonts.fonts.push(`/${font}`);
       }
@@ -89,10 +85,8 @@ const downloadFonts = async (fonts = [], options = {}) => {
   }
   console.log(text + " Successfully end!");
   let end = JSON.stringify(output, null, 2).replace(/\\\\/g, "/");
-  googleFonts=end
   fs.outputFileSync(outputData.full, end);
-  fs.outputFileSync('googleFonts/index.json', end);
+  fs.outputFileSync(`${__dirname}/googleFonts/index.json`, end);
   return JSON.parse(end);
 };
 module.exports = downloadFonts;
-module.exports.googleFonts = require('./googleFonts').googleFonts;
