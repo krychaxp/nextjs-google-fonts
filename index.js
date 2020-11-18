@@ -3,6 +3,7 @@ const path = require("path");
 const axios = require("axios");
 const del = require("del");
 const text = "> [nextjs-google-fonts]";
+const http = require("http");
 const downloadFonts = async (fonts = [], options = {}) => {
   if (fonts.length == 0) {
     console.log("Nothing Google Fonts Downloaded");
@@ -56,13 +57,7 @@ const downloadFonts = async (fonts = [], options = {}) => {
   for (let i = 0; i < fonts.length; i++) {
     const v = fonts[i];
     try {
-      const { data } = await axios.get(v, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36",
-        },
-      });
-      console.log(data)
+      const { data } = await axios.get(v);
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
       const newData = data.replace(
         /https:\/\/fonts\.gstatic\.com/g,
@@ -75,10 +70,16 @@ const downloadFonts = async (fonts = [], options = {}) => {
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
         const name = va.replace("https://fonts.gstatic.com", "");
-        const resp = await axios.get(va);
+        http.get(
+          va.replace('s',''),
+          function (response) {
+            const fp=path.join(process.cwd(),publicFolder,fontsFolder,name)
+            fs.outputFileSync(fp,'')
+            response.pipe(fs.createWriteStream(fp));
+          }
+        );
         const font = path.join(fontsFolder, name);
         output.googleFonts.fonts.push(`/${font}`);
-        fs.outputFileSync(path.join(publicFolder, font), resp.data);
       }
     } catch (e) {
       console.log(e);

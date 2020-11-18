@@ -1,7 +1,7 @@
 {
   "name": "nextjs-google-fonts",
-  "version": "1.0.3",
-  "description": "plugin for next.js",
+  "version": "1.0.5",
+  "description": "Plugin for next.js",
   "main": "index.js",
   "scripts": {
     "test": "node test"
@@ -30,6 +30,7 @@
     "axios": "^0.21.0",
     "del": "^6.0.0",
     "fs-extra": "^9.0.1",
+    "http": "0.0.1-security",
     "path": "^0.12.7"
   }
 }
