@@ -4,6 +4,7 @@ const axios = require("axios");
 const del = require("del");
 const text = "> [nextjs-google-fonts]";
 const http = require("http");
+let googleFonts={}
 const downloadFonts = async (fonts = [], options = {}) => {
   if (fonts.length == 0) {
     console.log("Nothing Google Fonts Downloaded");
@@ -88,7 +89,10 @@ const downloadFonts = async (fonts = [], options = {}) => {
   }
   console.log(text + " Successfully end!");
   let end = JSON.stringify(output, null, 2).replace(/\\\\/g, "/");
+  googleFonts=end
   fs.outputFileSync(outputData.full, end);
+  fs.outputFileSync('googleFonts/index.json', end);
   return JSON.parse(end);
 };
 module.exports = downloadFonts;
+module.exports.googleFonts = require('./googleFonts').googleFonts;

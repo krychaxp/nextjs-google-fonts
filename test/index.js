@@ -9,7 +9,7 @@
     fontsFolder: "fonts",
     styleFolder: "style",
     resetFolder: true,
-    prevent: true,
+    prevent: false,
     outputData: {
       name: "data.json",
     },
