@@ -1,5 +1,5 @@
 import React from "react";
-import { googleFonts } from "nextjs-google-fonts/googleFonts";
+import { googleFonts } from "../public/fonts/data.json";
 export default function index() {
   return (
     <>

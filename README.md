@@ -14,6 +14,8 @@ $ npm install nextjs-google-fonts
 
 ## How to use
 
+**If you want to use fonts on 'production', you must firstly download fonts to your 'public' folder!**
+
 Firstly, you must create new file e.g.: `./scripts/google-fonts.js` on your root path and pase this code:
 
 ```js
@@ -76,7 +78,7 @@ If you font to create your component, name it like `GoogleFonts.js` and paste th
 
 ```js
 import React from "react";
-import { googleFonts } from "nextjs-google-fonts/googleFonts";
+import { googleFonts } from "../public/fonts/data.json";
 export default function index() {
   return (
     <>
