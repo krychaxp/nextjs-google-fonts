@@ -1,9 +1,21 @@
 const fs = require("fs-extra");
 const path = require("path");
 const axios = require("axios");
-const del = require("del");
-const text = "> [nextjs-google-fonts]";
 const http = require("http");
+const text = "> [nextjs-google-fonts]";
+const deleteFolder = (p)=> {
+  if (fs.existsSync(p)) {
+    fs.readdirSync(p).forEach((file) => {
+      const curPath = path.join(p, file);
+      if (fs.lstatSync(curPath).isDirectory()) { 
+        deleteFolder(curPath);
+      } else { 
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(p);
+  }
+};
 const downloadFonts = async (fonts = [], options = {}) => {
   if (fonts.length == 0) {
     console.log("Nothing Google Fonts Downloaded");
@@ -42,16 +54,20 @@ const downloadFonts = async (fonts = [], options = {}) => {
     prevent,
   } = options;
   /********* */
-  if (prevent && fs.existsSync(outputData.full)) {
-    const last = JSON.parse(fs.readFileSync(outputData.full, "utf8"));
-    if (last.arguments.fonts.join() == fonts.join()) {
-      console.log(text + " (Prevent download again) - Fonts are already saved");
-      return last;
+  if (fs.existsSync(outputData.full)) {
+    if (prevent) {
+      const last = JSON.parse(fs.readFileSync(outputData.full, "utf8"));
+      if (last.arguments.fonts.join() == fonts.join()) {
+        console.log(
+          text + " (Prevent download again) - Fonts have been already saved"
+        );
+        return last;
+      }
     }
-  }
-  /********* */
-  if (resetFolder) {
-    del.sync([path.join(publicFolder, fontsFolder)]);
+    /********* */
+    if (resetFolder) {
+      deleteFolder(path.join(publicFolder,fontsFolder))
+    }
   }
   /********* */
   for (let i = 0; i < fonts.length; i++) {
@@ -86,7 +102,6 @@ const downloadFonts = async (fonts = [], options = {}) => {
   console.log(text + " Successfully end!");
   let end = JSON.stringify(output, null, 2).replace(/\\\\/g, "/");
   fs.outputFileSync(outputData.full, end);
-  fs.outputFileSync(`${__dirname}/googleFonts/index.json`, end);
   return JSON.parse(end);
 };
 module.exports = downloadFonts;
