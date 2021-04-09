@@ -16,7 +16,7 @@ $ npm install nextjs-google-fonts
 
 **If you want to use fonts on 'production', you must firstly download fonts to your 'public' folder!**
 
-Firstly, you must create new file e.g.: `./scripts/google-fonts.js` on your root path and pase this code:
+Firstly, you must create new file e.g.: `./scripts/google-fonts.js` on your root path and paste this code:
 
 ```js
 (async () => {
