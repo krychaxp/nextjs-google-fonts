@@ -14,119 +14,72 @@ $ npm install nextjs-google-fonts
 
 ## How to use
 
-**If you want to use fonts on 'production', you must firstly download fonts to your 'public' folder!**
+1. Firstly, you must add funtion with parameters into `next.config.js`:
 
-Firstly, you must create new file e.g.: `./scripts/google-fonts.js` on your root path and paste this code:
+- `fonts` - (default []) Array of google fonts urls (required)
+- `publicFolder` - (default "public") next.js 'public' folder
+- `fontsFolder` - (default "fonts") folder name where data should be saved (fonts+styles)
+- `styleFolder` - (default "style") folder with .css from google fonts url
+- `prevent` - (default true) prevent download/update fonts for every your 'npm run dev'
+- `remove` - (default true) remove previous fonts if you change something in 'fonts' array (works only if 'prevent' is 'true')
 
 ```js
-(async () => {
-  const download = require("nextjs-google-fonts");
-  const fonts=["https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"]
-  const options={
-    publicFolder: "public", // next.js 'public' folder
-    fontsFolder: "fonts", // folder name where data should be saved (fonts+styles)
-    styleFolder: "style", // folder with .css from google fonts url
-    resetFolder: true, // delete all files from the "fontsFolder" with downloaded data when downloading fonts again
-    prevent: true, // prevent download fonts for every your 'npm run dev'
-    outputData: {
-      name: "data.json", // name of file where be save your data about fonts (for your preverences ;) )
-      //path: '../..' , // the path where 'data.json' will be located. If is empty its return 'publicFolder'+'fontsFolder' destination
-    },
-  }
-  await download(fonts,options);
-})();
+const { withGoogleFonts } = require("nextjs-google-fonts");
+
+module.exports = withGoogleFonts({
+  ...,
+  googleFonts: {
+    fonts: [
+      "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap",
+    ],  // required
+    publicFolder: "public",  // optional
+    fontsFolder: "fonts",  // optional
+    styleFolder: "style", // optional
+    prevent: true, // optional
+    remove: true, // optional
+  },
+  ...,
+});
 ```
 
-- `fonts` - Array of google fonts urls
-- `options` - Object (this parametrs are default, so if you don't want to change something, you can delete this variable):
+## Structure of downloaded fonts (with default parameters)
 
 ```bash
 .
 ├── public
 │   └── fonts
 │        ├── fonts
-│        │   ├── ...woff / .ttf
+│        │   └── ...woff2
 │        ├── style
-│        │   ├── Roboto.css
+│        │   └── Roboto.css
 │        └── data.json
 ├── src
 ├── .gitignore
 ├── next.config.js
 ...
 ```
-    
-Next, you must run this code, so enter to `next.config.js` and add this part of code:
 
-```js
-module.exports = {
-  ...,
-  webpack: (config, {isServer}) => {
-    if (isServer) {
-      require("./scripts/google-fonts");
-    }
-    return config;
-  },
-  ...,
-};
-```
+2. Add `GoogleFonts` into next.js `<Head/>`:
 
-## Example
-
-> Code from :'nextjs-google-fonts/example'
-
-If you font to create your component, name it like `GoogleFonts.js` and paste this code:
-
-```js
+```jsx
 import React from "react";
-import { googleFonts } from "../public/fonts/data.json";
-export default function index() {
-  return (
-    <>
-      {googleFonts.fonts.map((v) => (
-        <link
-          key={v}
-          rel="preload"
-          href={v}
-          as="font"
-          type="font/ttf"
-          crossOrigin=""
-        />
-      ))}
-      {googleFonts.style.map((v) => (
-        <React.Fragment key={v}>
-          <link rel="stylesheet" href={v} />
-          <link rel="preload" as="style" href={v} />
-        </React.Fragment>
-      ))}
-    </>
-  );
-}
-```
+import Head from "next/head";
+import { GoogleFonts } from "nextjs-google-fonts/GoogleFonts";
 
-Then you should add this component into `<Head>` from `next/head`, e.g.:
-
-```js
-import React from 'react'
-import Head from 'next/head'
-import GoogleFonts from './GoogleFonts'
 export default function index() {
-    return (
-        <Head>
-            <GoogleFonts/>
-        </Head>
-    )
+  return <Head>{GoogleFonts()}</Head>;
 }
 ```
 
 ## Resources
 
-* [Github](https://github.com/krychaxp/nextjs-google-fonts)
+- [Github](https://github.com/krychaxp/nextjs-google-fonts)
 
 ## Author - Krychaxp
 
-* [Github](https://github.com/krychaxp)
-* [Website](https://krychaxp.pl/?ref=nextjs-google-fonts-readme)
- 
+- [Github](https://github.com/krychaxp)
+- [Website](https://krychaxp.pl/?ref=nextjs-google-fonts-readme)
+
 ## License
 
 [MIT](LICENSE)

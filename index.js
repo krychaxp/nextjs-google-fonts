@@ -2,106 +2,94 @@ const fs = require("fs-extra");
 const path = require("path");
 const axios = require("axios");
 const http = require("http");
-const text = "> [nextjs-google-fonts]";
-const deleteFolder = (p)=> {
-  if (fs.existsSync(p)) {
-    fs.readdirSync(p).forEach((file) => {
-      const curPath = path.join(p, file);
-      if (fs.lstatSync(curPath).isDirectory()) { 
-        deleteFolder(curPath);
-      } else { 
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(p);
-  }
-};
-const downloadFonts = async (fonts = [], options = {}) => {
+const log = (a) => console.log("> [nextjs-google-fonts] " + a);
+
+const downloadFonts = async ({
+  fonts = [],
+  publicFolder = "public",
+  fontsFolder = "fonts",
+  styleFolder = "style",
+  prevent = true,
+  remove = true,
+}) => {
   if (fonts.length == 0) {
-    console.log("Nothing Google Fonts Downloaded");
+    log("None Google Fonts Downloaded (Array is empty)");
     return;
   }
-  /********* */
-  options.publicFolder = options.publicFolder || "public";
-  options.fontsFolder = options.fontsFolder || "fonts";
-  options.styleFolder = options.styleFolder || "style";
-  options.resetFolder =
-    typeof options.resetFolder === "boolean" ? options.resetFolder : true;
-  options.prevent =
-    typeof options.prevent === "boolean" ? options.prevent : true;
-  options.outputData = options.outputData || {};
-  options.outputData.name = options.outputData.name || "data.json";
-  options.outputData.path =
-    options.outputData.path ||
-    path.join(options.publicFolder, options.fontsFolder);
-  options.outputData.full = path.join(
-    options.outputData.path,
-    options.outputData.name
-  );
-  /********* */
+
+  const dataPath = `/${publicFolder}/${fontsFolder}/data.json`;
+  const dataFullPath = path.join(process.cwd(), dataPath);
+
   const output = {
     googleFonts: { fonts: [], style: [] },
-    arguments: { fonts: fonts, options: options },
+    arguments: { fonts, publicFolder, fontsFolder, styleFolder, prevent },
     buildTime: new Date().toISOString(),
   };
-  /********* */
-  const {
-    publicFolder,
-    fontsFolder,
-    styleFolder,
-    resetFolder,
-    outputData,
-    prevent,
-  } = options;
-  /********* */
-  if (fs.existsSync(outputData.full)) {
+
+  if (fs.existsSync(dataFullPath)) {
+    const lastFile = fs.readFileSync(dataFullPath, "utf8");
+    fs.writeFileSync(path.join(__dirname, "data.json"), lastFile);
     if (prevent) {
-      const last = JSON.parse(fs.readFileSync(outputData.full, "utf8"));
+      const last = JSON.parse(lastFile);
       if (last.arguments.fonts.join() == fonts.join()) {
-        console.log(
-          text + " (Prevent download again) - Fonts have been already saved"
-        );
-        return last;
+        log("(Prevent download again) - Fonts have been already saved");
+        return;
       }
-    }
-    /********* */
-    if (resetFolder) {
-      deleteFolder(path.join(publicFolder,fontsFolder))
+      if (remove) {
+        fs.removeSync(path.join(process.cwd(), publicFolder, fontsFolder));
+      }
     }
   }
   /********* */
   for (let i = 0; i < fonts.length; i++) {
-    const v = fonts[i];
+    const currentFontUrl = fonts[i];
     try {
-      const { data } = await axios.get(v);
+      const { data } = await axios.get(currentFontUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
+        },
+      });
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
       const newData = data.replace(
         /https:\/\/fonts\.gstatic\.com/g,
         `/${fontsFolder}`
       );
-      const name = v.match(/\?family=(\w+)/)[1];
-      const css = path.join(fontsFolder, styleFolder, name + ".css");
-      fs.outputFileSync(path.join(publicFolder, css), newData);
-      output.googleFonts.style.push(`/${css}`);
+      const name = currentFontUrl.match(/\?family=(\w+)/)[1];
+      const css = `/${fontsFolder}/${styleFolder}/${name}.css`;
+      fs.outputFileSync(path.join(process.cwd(), publicFolder, css), newData);
+      output.googleFonts.style.push(css);
+
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
-        const name = va.replace("https://fonts.gstatic.com", "");
+        const name = va.replace("https://fonts.gstatic.com/", "");
         http.get(va.replace("s", ""), function (response) {
           const fp = path.join(process.cwd(), publicFolder, fontsFolder, name);
           fs.outputFileSync(fp, "");
           response.pipe(fs.createWriteStream(fp));
         });
-        const font = path.join(fontsFolder, name);
-        output.googleFonts.fonts.push(`/${font}`);
+        output.googleFonts.fonts.push(`/${fontsFolder}/${name}`);
       }
     } catch (e) {
-      console.log(e);
-      console.log(`${text} Cannot download following font:${v}`);
+      log(`Cannot download following font:${currentFontUrl}`);
     }
   }
-  console.log(text + " Successfully end!");
-  let end = JSON.stringify(output, null, 2).replace(/\\\\/g, "/");
-  fs.outputFileSync(outputData.full, end);
-  return JSON.parse(end);
+  const end = JSON.stringify(output, null, 2);
+  fs.outputFileSync(dataFullPath, end);
+  fs.writeFileSync(path.join(__dirname, "data.json"), end);
+  log("Successfully end!");
 };
-module.exports = downloadFonts;
+
+exports.withGoogleFonts = async (config) => {
+  const { googleFonts } = config;
+  if (!googleFonts) {
+    log(`You didn't add 'googleFonts' into 'next.config.js'`);
+    return config;
+  }
+  try {
+    await downloadFonts(googleFonts);
+  } catch (error) {
+    log("Unexpected error when downloading Google Fonts");
+  }
+  return config;
+};

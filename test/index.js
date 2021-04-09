@@ -1,18 +1,9 @@
-(async () => {
-  const download = require("../");
-  const fonts = [
-    "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap",
-    "https://fonts.googleapis.com/css?family=Montserrat&subset=latin-ext&display=swap",
-  ];
-  const resp = await download(fonts, {
-    publicFolder: "public",
-    fontsFolder: "fonts",
-    styleFolder: "style",
-    resetFolder: true,
-    prevent: false,
-    outputData: {
-      name: "data.json",
-    },
-  });
-  // console.log(resp); //data.json output
-})();
+const { withGoogleFonts } = require("../");
+
+withGoogleFonts({
+  googleFonts: {
+    fonts: [
+      "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&family=Roboto&subset=latin-ext&display=swap",
+    ],
+  },
+});
