@@ -28,7 +28,7 @@ module.exports = withGoogleFonts({
 });
 ```
 
-### Add `GoogleFonts` into next.js `<Head/>`:
+### Add `GoogleFonts` into `<Head/>`:
 
 ```jsx
 import React from "react";
