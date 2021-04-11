@@ -104,7 +104,7 @@ const downloadFonts = async ({
   log("Successfully end!");
 };
 
-exports.withGoogleFonts = async (config) => {
+exports.withGoogleFonts = (config) => {
   const { googleFonts } = config;
   if (!googleFonts) {
     log(`You didn't add 'googleFonts' into 'next.config.js'`);
