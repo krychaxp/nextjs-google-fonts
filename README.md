@@ -28,15 +28,34 @@ module.exports = withGoogleFonts({
 });
 ```
 
-### Add `GoogleFonts` into `<Head/>`:
+### Add fonts into `<Head/>`:
 
 ```jsx
 import React from "react";
 import Head from "next/head";
-import { GoogleFonts } from "nextjs-google-fonts/GoogleFonts";
+import { googleFonts, makeFontType } from "nextjs-google-fonts/GoogleFonts";
 
 export default function index() {
-  return <Head>{GoogleFonts()}</Head>;
+  return (
+    <Head>
+      {googleFonts.style.map((v) => (
+        <React.Fragment key={v}>
+          <link rel="stylesheet" href={v} />
+          <link rel="preload" as="style" href={v} />
+        </React.Fragment>
+      ))}
+      {googleFonts.fonts.map((v) => (
+        <link
+          key={v}
+          rel="preload"
+          href={v}
+          as="font"
+          type={makeFontType(v)}
+          crossOrigin=""
+        />
+      ))}
+    </Head>
+  );
 }
 ```
 
