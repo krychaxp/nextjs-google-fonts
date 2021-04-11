@@ -1,7 +1,24 @@
 const fs = require("fs");
 const path = require("path");
-const fetch = require("node-fetch");
+const request = require("request");
 const log = (a) => console.log("> [nextjs-google-fonts] " + a);
+
+const fetcher = (url) =>
+  new Promise((resolve, reject) => {
+    request(
+      {
+        url,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
+        },
+      },
+      (error, response, body) => {
+        if (error) reject(error);
+        resolve(body);
+      }
+    );
+  });
 
 const downloadFonts = async ({
   fonts = [],
@@ -42,12 +59,7 @@ const downloadFonts = async ({
   for (let i = 0; i < fonts.length; i++) {
     const currentFontUrl = fonts[i];
     try {
-      const data = await fetch(currentFontUrl, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
-        },
-      }).then((v) => v.text());
+      const data = await fetcher(currentFontUrl);
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
       const newData = data.replace(
         /https:\/\/fonts\.gstatic\.com/g,
@@ -61,12 +73,11 @@ const downloadFonts = async ({
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
         const name = va.replace("https://fonts.gstatic.com/", "");
-        const result = await fetch(va).then((v) => v.text());
         fs.mkdirSync(
           path.join(fontsPath, name.split("/").slice(0, -1).join("/")),
           { recursive: true }
         );
-        fs.writeFileSync(path.join(fontsPath, name), result);
+        request(va).pipe(fs.createWriteStream(path.join(fontsPath, name)));
         fontsArray.push(`/${fontsFolder}/${name}`);
       }
     } catch (e) {
