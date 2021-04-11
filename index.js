@@ -111,9 +111,10 @@ exports.withGoogleFonts = async (config) => {
     return config;
   }
   try {
-    await downloadFonts(googleFonts);
+    downloadFonts(googleFonts);
   } catch (error) {
     log("Unexpected error when downloading Google Fonts");
+  }finally{
+    return config;
   }
-  return config;
 };
