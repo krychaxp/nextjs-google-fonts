@@ -1,6 +1,6 @@
 {
   "name": "nextjs-google-fonts",
-  "version": "3.2.21",
+  "version": "3.2.25",
   "description": "Plugin for next.js",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,6 @@
   },
   "homepage": "https://github.com/krychaxp/nextjs-google-fonts#readme",
   "dependencies": {
-    "request": "^2.88.2"
+    "axios": "^0.21.1"
   }
 }

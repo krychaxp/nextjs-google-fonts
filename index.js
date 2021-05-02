@@ -1,23 +1,15 @@
 const fs = require("fs");
 const path = require("path");
-const request = require("request");
+const axios = require("axios");
 const log = (a) => console.log("> [nextjs-google-fonts] " + a);
 
 const fetcher = (url) =>
-  new Promise((resolve, reject) => {
-    request(
-      {
-        url,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
-        },
-      },
-      (error, response, body) => {
-        if (error) reject(error);
-        resolve(body);
-      }
-    );
+  axios({
+    url,
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
+    },
   });
 
 const downloadFonts = async ({
@@ -59,7 +51,8 @@ const downloadFonts = async ({
   for (let i = 0; i < fonts.length; i++) {
     const currentFontUrl = fonts[i];
     try {
-      const data = await fetcher(currentFontUrl);
+      const { data } = await fetcher(currentFontUrl);
+      console.log(currentFontUrl, data);
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
       const newData = data.replace(
         /https:\/\/fonts\.gstatic\.com/g,
@@ -77,7 +70,8 @@ const downloadFonts = async ({
           path.join(fontsPath, name.split("/").slice(0, -1).join("/")),
           { recursive: true }
         );
-        request(va).pipe(fs.createWriteStream(path.join(fontsPath, name)));
+        const { data } = await fetcher(va);
+        fs.writeFileSync(path.join(fontsPath, name), data);
         fontsArray.push(`/${fontsFolder}/${name}`);
       }
     } catch (e) {
@@ -114,7 +108,7 @@ exports.withGoogleFonts = (config) => {
     downloadFonts(googleFonts);
   } catch (error) {
     log("Unexpected error when downloading Google Fonts");
-  }finally{
+  } finally {
     return config;
   }
 };
