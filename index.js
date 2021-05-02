@@ -52,7 +52,6 @@ const downloadFonts = async ({
     const currentFontUrl = fonts[i];
     try {
       const { data } = await fetcher(currentFontUrl);
-      console.log(currentFontUrl, data);
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
       const newData = data.replace(
         /https:\/\/fonts\.gstatic\.com/g,
