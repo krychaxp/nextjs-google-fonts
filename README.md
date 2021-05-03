@@ -23,37 +23,21 @@ module.exports = withGoogleFonts({
   googleFonts: {
     fonts: [
       "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap",
-    ], 
-  }
+    ],
+  },
 });
 ```
 
 ### Add fonts into `<Head/>`:
 
 ```jsx
-import React from "react";
 import Head from "next/head";
-import { googleFonts, makeFontType } from "nextjs-google-fonts/GoogleFonts";
+import { GoogleFonts } from "nextjs-google-fonts/GoogleFonts";
 
 export default function index() {
   return (
     <Head>
-      {googleFonts.style.map((v) => (
-        <React.Fragment key={v}>
-          <link rel="stylesheet" href={v} />
-          <link rel="preload" as="style" href={v} />
-        </React.Fragment>
-      ))}
-      {googleFonts.fonts.map((v) => (
-        <link
-          key={v}
-          rel="preload"
-          href={v}
-          as="font"
-          type={makeFontType(v)}
-          crossOrigin=""
-        />
-      ))}
+      {GoogleFonts()}
     </Head>
   );
 }
@@ -63,7 +47,6 @@ export default function index() {
 <br/>
 <br/>
 
-
 # Advanced setup
 
 ```js
@@ -71,22 +54,22 @@ const { withGoogleFonts } = require("nextjs-google-fonts");
 
 module.exports = withGoogleFonts({
   googleFonts: {
-    fonts: [],  // required
-    publicFolder: "public",  // optional
-    fontsFolder: "fonts",  // optional
+    fonts: [], // required
+    publicFolder: "public", // optional
+    fontsFolder: "fonts", // optional
     styleFolder: "style", // optional
     prevent: true, // optional
     remove: true, // optional
-  }
+  },
 });
 ```
 
-  - `fonts` - (default []) Array of google fonts urls (required)
-  - `publicFolder` - (default "public") next.js 'public' folder
-  - `fontsFolder` - (default "fonts") folder name where data should be saved (fonts+styles)
-  - `styleFolder` - (default "style") folder with .css from google fonts url
-  - `prevent` - (default true) prevent download/update fonts for every your 'npm run dev'
-  - `remove` - (default true) remove previous fonts if you change something in 'fonts' array (works only if 'prevent' is 'true')
+- `fonts` - (default []) Array of google fonts urls (required)
+- `publicFolder` - (default "public") next.js 'public' folder
+- `fontsFolder` - (default "fonts") folder name where data should be saved (fonts+styles)
+- `styleFolder` - (default "style") folder with .css from google fonts url
+- `prevent` - (default true) prevent download/update fonts for every your 'npm run dev'
+- `remove` - (default true) remove previous fonts if you change something in 'fonts' array (works only if 'prevent' is 'true')
 
 <br/>
 <br/>

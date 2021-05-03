@@ -30,7 +30,7 @@ const downloadFonts = async ({
   const stylesPath = path.join(fontsPath, styleFolder);
   const dataPath = path.join(fontsPath, "data.json");
   const fontsArray = [];
-  const stylesArray = [];
+  let styles = "";
 
   if (fs.existsSync(dataPath)) {
     const lastFile = fs.readFileSync(dataPath, "utf8");
@@ -54,15 +54,10 @@ const downloadFonts = async ({
     try {
       const { data } = await fetcher(currentFontUrl);
       const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
-      const newData = data.replace(
-        /https:\/\/fonts\.gstatic\.com/g,
-        `/${fontsFolder}`
-      );
-      const name = currentFontUrl.match(/\?family=(\w+)/)[1];
-      const cssFile = `${name}.css`;
-      fs.writeFileSync(path.join(stylesPath, cssFile), newData);
-      stylesArray.push(`/${fontsFolder}/${styleFolder}/${cssFile}`);
-
+      const newData = data
+        .replace(/https:\/\/fonts\.gstatic\.com/g, `/${fontsFolder}`)
+        .replace(/[\n ]/g, "");
+      styles += newData;
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
         const name = va.replace("https://fonts.gstatic.com/", "");
@@ -80,7 +75,7 @@ const downloadFonts = async ({
   }
 
   const output = {
-    googleFonts: { fonts: fontsArray, style: stylesArray },
+    googleFonts: { fonts: fontsArray, style: styles },
     arguments: {
       fonts,
       publicFolder,
