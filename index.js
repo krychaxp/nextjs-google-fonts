@@ -17,7 +17,6 @@ const downloadFonts = async ({
   fonts = [],
   publicFolder = "public",
   fontsFolder = "fonts",
-  styleFolder = "style",
   prevent = true,
   remove = true,
 }) => {
@@ -27,7 +26,6 @@ const downloadFonts = async ({
   }
   const publicPath = path.resolve(publicFolder);
   const fontsPath = path.join(publicPath, fontsFolder);
-  const stylesPath = path.join(fontsPath, styleFolder);
   const dataPath = path.join(fontsPath, "data.json");
   const fontsArray = [];
   let styles = "";
@@ -47,7 +45,6 @@ const downloadFonts = async ({
     }
   }
 
-  fs.mkdirSync(stylesPath, { recursive: true });
   /********* */
   for (let i = 0; i < fonts.length; i++) {
     const currentFontUrl = fonts[i];
@@ -80,7 +77,6 @@ const downloadFonts = async ({
       fonts,
       publicFolder,
       fontsFolder,
-      styleFolder,
       prevent,
       remove,
     },
