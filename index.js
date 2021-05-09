@@ -84,9 +84,13 @@ const downloadFonts = async ({
   };
 
   const end = JSON.stringify(output, null, 2);
-  fs.writeFileSync(dataPath, end);
-  fs.writeFileSync(path.join(__dirname, "data.json"), end);
-  log("Successfully end!");
+  try {
+    fs.writeFileSync(dataPath, end);
+    fs.writeFileSync(path.join(__dirname, "data.json"), end);
+    log("Successfully end!");
+  } catch (error) {
+    log("Something goes wrong!");
+  }
 };
 
 exports.withGoogleFonts = (config) => {
