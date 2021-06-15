@@ -32,7 +32,6 @@ const downloadFonts = async ({
 
   if (fs.existsSync(dataPath)) {
     const lastFile = fs.readFileSync(dataPath, "utf8");
-    fs.writeFileSync(path.join(__dirname, "data.json"), lastFile);
     if (prevent) {
       const last = JSON.parse(lastFile);
       if (last.arguments.fonts.join() == fonts.join()) {
@@ -86,7 +85,6 @@ const downloadFonts = async ({
   const end = JSON.stringify(output, null, 2);
   try {
     fs.writeFileSync(dataPath, end);
-    fs.writeFileSync(path.join(__dirname, "data.json"), end);
     log("Successfully end!");
   } catch (error) {
     log("Something goes wrong!");
