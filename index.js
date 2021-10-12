@@ -2,9 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const log = (a) => console.log("> [nextjs-google-fonts] " + a);
+const replaceValue =
+  /(https?:\/\/fonts\.gstatic\.com|https?:\/\/storage\.googleapis\.com)/g;
 
-const fetcher = (url, prev) =>
-  axios({
+const fetcher = async (url, prev) => {
+  const { data } = await axios({
     url,
     headers: {
       "User-Agent":
@@ -12,6 +14,8 @@ const fetcher = (url, prev) =>
     },
     ...prev,
   });
+  return data;
+};
 
 const downloadFonts = async ({
   fonts = [],
@@ -49,22 +53,27 @@ const downloadFonts = async ({
   for (let i = 0; i < fonts.length; i++) {
     const currentFontUrl = fonts[i];
     try {
-      const { data } = await fetcher(currentFontUrl);
-      const urls = data.match(/url([^)]*)/g).map((v) => v.slice(4));
+      const data = await fetcher(currentFontUrl);
+      const urls = data
+        .match(/url([^)]*)/g)
+        .map((v) => v.slice(4).replace(/'/g, ""));
       const newData = data
-        .replace(/https:\/\/fonts\.gstatic\.com/g, `/${fontsFolder}`)
+        .replace(replaceValue, `/${fontsFolder}`)
         .replace(/[\n ]/g, "");
       styles += newData;
+      const prop = await Promise.all(
+        urls.map((va) => fetcher(va, { responseType: "arraybuffer" }))
+      );
       for (let j = 0; j < urls.length; j++) {
         const va = urls[j];
-        const name = va.replace("https://fonts.gstatic.com/", "");
+        const name = va.replace(replaceValue, "");
         fs.mkdirSync(
           path.join(fontsPath, name.split("/").slice(0, -1).join("/")),
           { recursive: true }
         );
-        const { data } = await fetcher(va, { responseType: "arraybuffer" });
+        const data = prop[j];
         fs.writeFileSync(path.join(fontsPath, name), data);
-        fontsArray.push(`/${fontsFolder}/${name}`);
+        fontsArray.push(`/${fontsFolder}${name}`);
       }
     } catch (e) {
       log(`Cannot download following font:${currentFontUrl}`);

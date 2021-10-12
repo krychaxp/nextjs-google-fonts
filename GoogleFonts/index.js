@@ -9,7 +9,9 @@ exports.GoogleFonts = () =>
   React.createElement(
     React.Fragment,
     null,
-    /*#__PURE__*/ React.createElement("style", null, googleFonts.style),
+    /*#__PURE__*/ React.createElement("style", {
+      dangerouslySetInnerHTML: { __html: googleFonts.style },
+    }),
     googleFonts.fonts.map((v) =>
       /*#__PURE__*/ React.createElement("link", {
         key: v,
